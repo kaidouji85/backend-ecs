@@ -10,12 +10,9 @@ export class BackendEcsStack extends cdk.Stack {
     const stage = new cdk.CfnParameter(this, 'stage', {
       type: 'String',
       description: 'serverless stage name',
-    });
-    const websocketAPIID = new cdk.CfnParameter(this, 'websocketAPIID', {
-      type: 'String',
-      description: 'websocker api gateway id',
-    });
-
+    }).valueAsString;
+    const websocketAPIID = cdk.Fn.importValue(`gbraver-burst-serverless:${stage}:WebsoketApiId`);
+    
     const vpc = new ec2.Vpc(this, "vpc", {
       natGateways: 0,
       subnetConfiguration: [
@@ -61,8 +58,8 @@ export class BackendEcsStack extends cdk.Stack {
     taskDefinition.addContainer("demo-container", {
       image: ecs.ContainerImage.fromEcrRepository(repo),
       environment: {
-        STAGE: stage.valueAsString,
-        WEBSOCKET_API_ID: websocketAPIID.valueAsString,
+        STAGE: stage,
+        WEBSOCKET_API_ID: websocketAPIID,
       },
       logging
     });
