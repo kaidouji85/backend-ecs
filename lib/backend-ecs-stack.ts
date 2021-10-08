@@ -26,7 +26,6 @@ export class BackendEcsStack extends cdk.Stack {
         }
       ]
     });
-
     vpc.addInterfaceEndpoint("ecr-endpoint", {
       service: ec2.InterfaceVpcEndpointAwsService.ECR
     });
@@ -35,9 +34,6 @@ export class BackendEcsStack extends cdk.Stack {
     });
     vpc.addInterfaceEndpoint("logs-endpoint", {
       service: ec2.InterfaceVpcEndpointAwsService.CLOUDWATCH_LOGS
-    });
-    vpc.addInterfaceEndpoint("ws-api-gateway-endpoint", {
-      service: ec2.InterfaceVpcEndpointAwsService.APIGATEWAY
     });
     vpc.addGatewayEndpoint("s3-endpoint", {
       service: ec2.GatewayVpcEndpointAwsService.S3,
@@ -60,11 +56,7 @@ export class BackendEcsStack extends cdk.Stack {
             'dynamodb:Scan',
             'dynamodb:BatchWrite*',
           ],
-        }),
-        new iam.PolicyStatement({
-          resources: ['arn:aws:execute-api:*:*:**/@connections/*'],
-          actions: ['execute-api:ManageConnections'],
-        }),
+        })
       ],
     });
     const matchMakeServiceTaskRole = new iam.Role(this, 'match-make-service-task-role', {
