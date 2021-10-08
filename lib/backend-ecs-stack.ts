@@ -13,18 +13,9 @@ export class BackendEcsStack extends cdk.Stack {
       description: 'serverless stage name',
     }).valueAsString;
     const websocketAPIID = cdk.Fn.importValue(`gbraver-burst-serverless:${stage}:WebsoketApiId`);
-    const connectionsTableARN =  new cdk.CfnParameter(this, 'conectionsTableARN', {
-      type: 'String',
-      description: 'arn of connections table',
-    }).valueAsString;
-    const casualMatchEntriesTableARN = new cdk.CfnParameter(this, 'casualMatchEntriesTableARN', {
-      type: 'String',
-      description: 'arn of casual match entries table',
-    }).valueAsString;
-    const battlesTableARN = new cdk.CfnParameter(this, 'battlesTableARN', {
-      type: 'String',
-      description: 'arn of battles table',
-    }).valueAsString;
+    const connectionsTableARN = cdk.Fn.importValue(`gbraver-burst-serverless:${stage}:ConnectionsTableArn`);
+    const casualMatchEntriesTableARN = cdk.Fn.importValue(`gbraver-burst-serverless:${stage}:CasualMatchEntriesTableArn`);
+    const battlesTableARN = cdk.Fn.importValue(`gbraver-burst-serverless:${stage}:BattlesTableArn`);
     
     const vpc = new ec2.Vpc(this, "vpc", {
       natGateways: 0,
@@ -69,6 +60,10 @@ export class BackendEcsStack extends cdk.Stack {
             'dynamodb:Scan',
             'dynamodb:BatchWrite*',
           ],
+        }),
+        new iam.PolicyStatement({
+          resources: ['arn:aws:execute-api:*:*:**/@connections/*'],
+          actions: ['execute-api:ManageConnections'],
         }),
       ],
     });
